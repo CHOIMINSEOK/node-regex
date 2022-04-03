@@ -1,4 +1,4 @@
 
 const { runSimpleRegex } = require('./regex')
 
-console.log(runSimpleRegex('baabaa'))
+console.log(runSimpleRegex('babaa'))

@@ -4,6 +4,9 @@
 const initState = 0
 const finalState = 3
 
+// nfa could have several results
+const finalStateResultGroup = []
+
 const stateMatchTable = {
     0 : {
         'a' : [0, 1],
@@ -17,40 +20,43 @@ const stateMatchTable = {
         'a' : [3],
         'b' : [3],
     },
-    3 : {
-        'a' : [3],
-        'b' : [3],
-    }
 }
 
 function runSimpleRegex(input) {
-    let currentState = initState
-
-    currentState = reduce(currentState, input)
-
-    return currentState === finalState
+    reduce(initState, input)
+    return finalStateResultGroup.includes(finalState)
 }
 
 function reduce(currentState, input) {
-    console.log(`state: ${currentState}, input: ${input}`)
     const inputLength = input.length
     let state = currentState
-    for(let i=0; i < inputLength-1; i++) {
+
+    // if traverse is finished, keep it as final result
+    if(input.length === 0) {
+        finalStateResultGroup.push(currentState)
+    }
+
+    if (currentState === finalState) {
+        return finalState
+    }
+
+    for(let i=0; i < inputLength; i++) {
+
+        // finish loop if state becomes final state before traversing all input
+        if (state === finalState) {
+            return finalState
+        }
 
         const transferRule = stateMatchTable[state]
         const stateCandidates = transferRule[input[i]]
 
         stateCandidates.forEach(sc => {
-            if (sc === finalState) state = finalState
             state = reduce(sc, input.substring(1))
         })
     }
 
     return state
 }
-
-
-
 
 module.exports = {
     runSimpleRegex
