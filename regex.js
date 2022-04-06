@@ -18,11 +18,14 @@ function runSimpleRegex(pattern, input) {
     finalState = parsedRule.finalState
     stateMatchTable = parsedRule.stateMatchTable
 
+    console.log(initState)
+    console.log(finalState)
     console.log(stateMatchTable)
+    console.log('=============')
 
     reduce(initState, input)
 
-    console.log(`finalStateResultGroup : ${finalStateResultGroup}`)
+    console.log(finalStateResultGroup)
     return finalStateResultGroup.includes(finalState)
 }
 
@@ -42,7 +45,6 @@ function reduce(currentState, input) {
     for(let i=0; i < inputLength; i++) {
 
         // finish loop if state becomes final state before traversing all input
-        console.log(`state: ${state} == finalState: ${finalState} = ${state === finalState}`)
         if (state === finalState) {
             return finalState
         }
@@ -50,9 +52,7 @@ function reduce(currentState, input) {
         const transferRule = stateMatchTable[state]
         const stateCandidates = transferRule[input[i]]
 
-        console.log(`i: ${i}, state: ${state} transferRule: ${JSON.stringify(transferRule)}, input[i]: ${input[i]}, stateCandidates: ${stateCandidates}`)
-
-        stateCandidates.forEach(sc => {
+        stateCandidates?.forEach(sc => {
             state = reduce(sc, input.substring(1))
         })
     }
