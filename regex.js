@@ -1,29 +1,28 @@
 // [ab]*a[ab][ab]
 // baaba
 
-const initState = 0
-const finalState = 3
+const { parse } = require('./parser')
+
+let initState
+let finalState
+let stateMatchTable
 
 // nfa could have several results
 const finalStateResultGroup = []
 
-const stateMatchTable = {
-    0 : {
-        'a' : [0, 1],
-        'b' : [0]
-    },
-    1 : {
-        'a' : [2],
-        'b' : [2],
-    },
-    2 : {
-        'a' : [3],
-        'b' : [3],
-    },
-}
 
-function runSimpleRegex(input) {
+function runSimpleRegex(pattern, input) {
+    const parsedRule = parse(pattern)
+
+    initState = parsedRule.initState
+    finalState = parsedRule.finalState
+    stateMatchTable = parsedRule.stateMatchTable
+
+    console.log(stateMatchTable)
+
     reduce(initState, input)
+
+    console.log(`finalStateResultGroup : ${finalStateResultGroup}`)
     return finalStateResultGroup.includes(finalState)
 }
 
@@ -43,12 +42,15 @@ function reduce(currentState, input) {
     for(let i=0; i < inputLength; i++) {
 
         // finish loop if state becomes final state before traversing all input
+        console.log(`state: ${state} == finalState: ${finalState} = ${state === finalState}`)
         if (state === finalState) {
             return finalState
         }
 
         const transferRule = stateMatchTable[state]
         const stateCandidates = transferRule[input[i]]
+
+        console.log(`i: ${i}, state: ${state} transferRule: ${JSON.stringify(transferRule)}, input[i]: ${input[i]}, stateCandidates: ${stateCandidates}`)
 
         stateCandidates.forEach(sc => {
             state = reduce(sc, input.substring(1))
